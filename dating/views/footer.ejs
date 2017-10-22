@@ -1,0 +1,432 @@
+	
+<script>
+	//checks if all the fields in form are filled, and changes colors of the steps accordingly
+	function stepProgress(stepNo) {
+		var i;
+		var x = document.getElementsByClassName("user_form_style");
+		for (i = 0; i < x.length; i++) {
+		   x[i].style.display = "none";
+		}
+		document.getElementById(stepNo).style.display = "block";  
+	}
+	
+	var j = 0;
+	
+	function colorProgress(liId) {
+		j++;
+		var y = document.getElementsByClassName("step_color");
+		y[j].style.background = "#5ba9ea";
+	}
+	
+	function colorBack(liId) {
+		var y = document.getElementsByClassName("step_color");
+		y[j].style.background = "none";
+		j--;
+	}
+	
+	function checkField(stepNo, liId) {
+	  if (stepNo == 'step2' && (document.getElementById('f_name').value == "" || document.getElementById('l_name').value == "" || document.getElementById('country').value == "" || (document.getElementById('gender1').checked == false && document.getElementById('gender2').checked == false) || document.getElementById('age').value == "")) {
+		  swal({
+			  text: "Make sure all the fields are filled in",
+			  type: "error",
+			  customClass: "alert",
+			});
+	  }
+	  else if (stepNo == 'step3' && (document.getElementById('email').value == "" || document.getElementById('username').value == "" || document.getElementById('password').value == "" || document.getElementById('conf_pass').value == "")) {
+		  swal({
+			  text: "Make sure all the fields are filled in",
+			  type: "error",
+			  customClass: "alert",
+			});
+	  }
+	  else if (stepNo == 'step3' && (!document.getElementById("email").value.match(/@/g) || document.getElementById('username').value.length < 4 || document.getElementById('username').value.length > 11 || document.getElementById("usernameMessage").innerHTML == "Username is already taken" || document.getElementById('password').value.length < 5 || (document.getElementById('password').value != document.getElementById('conf_pass').value))) {
+		  swal({
+			  text: "Make sure all the fields are filled out correctly",
+			  type: "error",
+			  customClass: "alert",
+			});
+	  }
+	  else {
+		  stepProgress(stepNo);
+		  colorProgress(liId);
+	  }
+	}
+
+	
+	//checks the email format, username availability and password match	
+	function checkEmail() {
+		var email = document.getElementById("email").value;
+		if(email == "") {
+			document.getElementById("emailMessage").innerHTML = "Please fill out this field";
+			document.getElementById("emailMessage").style.color = "#777777";
+			document.getElementById("emailMessage").style.marginBottom = "12px";
+			document.getElementById("emailMessage").style.display = "block";
+		}
+		else if(!email.match(/@/g)) {
+			document.getElementById("emailMessage").innerHTML = "Please insert a valid email address";
+			document.getElementById("emailMessage").style.color = "#d83153";
+			document.getElementById("emailMessage").style.marginBottom = "12px";
+			document.getElementById("emailMessage").style.display = "block";
+		}
+		else {
+			document.getElementById("emailMessage").style.display = "none";
+		}
+	}
+	
+	//live checks the availability of username
+	function checkUsername() {
+	    var xhttp = new XMLHttpRequest();
+	    var username = document.getElementById("username").value;
+	    if(username == "") {
+			document.getElementById("usernameMessage").innerHTML = "Please fill out this field";
+			document.getElementById("usernameMessage").style.color = "#777777";
+			document.getElementById("usernameMessage").style.marginBottom = "12px";
+	    }
+		else if(username.length < 4 || username.length > 11) {
+			document.getElementById("usernameMessage").innerHTML = "Username should be 4 to 12 characters long";
+			document.getElementById("usernameMessage").style.color = "#d83153";
+			document.getElementById("usernameMessage").style.marginBottom = "12px";
+		}
+	    else {
+	    	xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					if(this.responseText == "true") {
+						document.getElementById("usernameMessage").innerHTML = "Username is already taken";
+						document.getElementById("usernameMessage").style.color = "#d83153";
+						document.getElementById("usernameMessage").style.marginBottom = "12px";
+					}
+					else {
+						document.getElementById("usernameMessage").innerHTML = "Username is available";
+						document.getElementById("usernameMessage").style.color = "#57a2e0";
+						document.getElementById("usernameMessage").style.marginBottom = "12px";
+					}
+				}
+			};
+			xhttp.open("GET", "/users/isusernametaken/"+username, true);
+			xhttp.send();
+		}
+	}
+	
+	//checks if passwords match
+	function checkPassword() {
+		var password1 = document.getElementById("password").value;
+		var password2 = document.getElementById("conf_pass").value;
+		if(password1.length < 5) {
+			document.getElementById("passwordMessage").innerHTML = "Password should be at least 5 characters long";
+			document.getElementById("passwordMessage").style.color = "#d83153";
+			document.getElementById("passwordMessage").style.marginBottom = "12px";
+			document.getElementById("passwordMessage").style.display = "block";
+		}
+		else if(password2 != password1) {
+			document.getElementById("passwordMessage").innerHTML = "Passwords do not match";
+			document.getElementById("passwordMessage").style.color = "#d83153";
+			document.getElementById("passwordMessage").style.marginBottom = "12px";
+			document.getElementById("passwordMessage").style.display = "block";
+		}
+		else {
+			document.getElementById("passwordMessage").style.display = "none";
+		}
+	}
+	
+	
+	function checkSignin() {
+		var xhttp = new XMLHttpRequest();		
+	    var user_signin = document.getElementById("username_signin").value;
+		var password_signin = document.getElementById("password_signin").value;
+	
+		xhttp.onreadystatechange = function() {
+			
+			if (this.readyState == 4 && this.status == 200) {
+				
+				document.getElementById("signin").addEventListener("click", function(event){
+					event.preventDefault();
+				});
+				
+				if(this.responseText === "true") {
+					swal({
+					  text: "Make sure the username is typed in correctly",
+					  type: "error",
+					  customClass: "alert",
+					});
+				}
+				else {
+					/*document.getElementById("signin").addEventListener("submit", function(event){
+						location.href = "/signin";
+					});*/
+					$("#form_signin").submit();
+				}
+			}
+		};
+		xhttp.open("POST", "/users/checkuser", true);
+		xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		xhttp.send('username='+user_signin+'&password='+password_signin);
+	}
+	
+	
+	function searchUsers() {	
+		var xhttp = new XMLHttpRequest();
+		var country_list = document.getElementById("countries");	
+		var search_input = document.getElementById("search_input").value;
+		if(!search_input){return}
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				var result = JSON.parse(this.responseText);
+				while(country_list.firstChild) {
+					country_list.removeChild(country_list.firstChild);
+				}
+				if(result.length) {
+					for (var i = 0; i < result.length; i++) {
+						var recommendation = document.createElement("option");
+						recommendation.value = result[i].country_name;
+						country_list.appendChild(recommendation);
+					}
+				}
+				else {
+					var recommendation = document.createElement("option");
+					recommendation.value = "No results found";
+					country_list.appendChild(recommendation);
+				}
+			}
+		}
+		xhttp.open("GET", "/users/search/"+search_input, true);
+		xhttp.send();
+	}
+	
+	
+	function filterUsers() {
+		var xhttp = new XMLHttpRequest();
+		var users_ul = document.getElementById("users_list");
+		var gender_select = document.getElementById("filter_gender");
+		var gender = gender_select.options[gender_select.selectedIndex].value;
+		
+		var country = document.getElementById("search_input").value;
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				var result = JSON.parse(this.responseText);
+				while(users_ul.firstChild) {
+					users_ul.removeChild(users_ul.firstChild);
+				}
+				for(var i = 0; i < result.length; i++) {
+					console.log(result);
+					var users_li = document.createElement("li");
+					var div_1 = document.createElement("div");
+					div_1.className = "users_decoration";
+					var div_1_1 = document.createElement("div");
+					div_1_1.className = "users_pic";
+					var img = document.createElement("img");
+					if(result[i].image_url) {
+						img.src = result[i].image_url.toString();
+					}
+					else {
+						if(result[i].gender == "F") {
+							img.src = "../images/user_female_ai.png";
+						}
+						else {
+							img.src = "../images/user_male_ai.png";
+						}
+					}
+					var div_1_2 = document.createElement("div");
+					div_1_2.className = "users_content";
+					var fullname = document.createElement("h5");
+					fullname.innerHTML = result[i].name + " " + result[i].surname;
+					var age = document.createElement("p");
+					age.innerHTML = result[i].age + " years old";
+					var country_name = document.createElement("p");
+					country_name.style.borderBottom = "1px solid dimgray";
+					country_name.innerHTML = "Lives in " + result[i].country_name;
+					
+					var chat_btn = document.createElement("button");
+					chat_btn.className = "chat_btn";
+					chat_btn.user = {id:result[i].user_id, name:result[i].name, surname:result[i].surname};
+					chat_btn.addEventListener("click", function(){
+						register_popup(this.user.id, this.user.name + " " + this.user.surname);
+					});
+					chat_btn.innerHTML = "Chat";
+					
+					div_1_1.appendChild(img);
+					div_1_2.appendChild(fullname);
+					div_1_2.appendChild(age);
+					div_1_2.appendChild(country_name);
+					if(result[i].description != null) {
+						var description = document.createElement("h6");
+						description.style.fontStyle = "italic";
+						description.innerHTML = '"' + result[i].description + '"';
+						div_1_2.appendChild(description);
+					}
+					div_1_2.appendChild(chat_btn);
+					
+					div_1.appendChild(div_1_1);
+					div_1.appendChild(div_1_2);
+					users_li.appendChild(div_1);
+					users_ul.appendChild(users_li);
+					
+					/*
+					var popups = function () {
+						var id = ;
+						var name = ;
+						return register_popup(id, name);
+					};
+					document.getElementById("samin").addEventListener("click", popups());*/
+				}
+			}	
+		}
+		xhttp.open("GET", "/users/filter/?country=" + country + '&gender=' + gender, true);
+		xhttp.send();
+	}
+	
+	
+	$("#del_profile").click(function() {
+		swal({
+		  
+		  text: "Your profile will be permanently deleted. Are you sure you want to do this?",
+		  imageUrl: "../images/cupid.jpg",
+		  imageWidth: 200,
+		  imageHeight: 200,
+		  customClass: "alert",
+		  showCancelButton: true,
+		  confirmButtonColor: '#3085d6',
+		  cancelButtonColor: '#dc143c',
+		  confirmButtonText: "Yes, I'm sure"
+		}).then(function() {
+			location.href = '/users/profile/delete'
+		}, function() {
+			return;
+		});				
+	});
+	
+	
+/*CHAT POPUPS*/
+Array.remove = function(array, from, to) {
+                var rest = array.slice((to || from) + 1 || array.length);
+                array.length = from < 0 ? array.length + from : from;
+                return array.push.apply(array, rest);
+            };
+        
+            //this variable represents the total number of popups can be displayed according to the viewport width
+            var total_popups = 0;
+            
+            //arrays of popups ids
+            var popups = [];
+        
+            //this is used to close a popup
+            function close_popup(id) {
+                for(var i = 0; i < popups.length; i++) {
+                    if(id == popups[i]) {
+                        Array.remove(popups, i);
+                        document.getElementById(id).style.display = "none";                       
+                        calculate_popups();
+                        
+                        return;
+                    }
+                }   
+            }
+        
+            //displays the popups. Displays based on the maximum number of popups that can be displayed on the current viewport width
+            function display_popups() {
+                var right = 10;
+                var i = 0;
+                for(i; i < total_popups; i++) {
+                    if(popups[i] != undefined) {
+                        var element = document.getElementById(popups[i]);
+                        element.style.right = right + "px";
+                        right = right + 310;
+                        element.style.display = "block";
+                    }
+                }
+                
+                for(var j = i; j < popups.length; j++) {
+                    var element = document.getElementById(popups[j]);
+                    element.style.display = "none";
+                }
+            }
+            
+            //creates markup for a new popup. Adds the id to popups array.
+            function register_popup(id, name) {
+                for(var i = 0; i < popups.length; i++) {   
+                    //already registered. Bring it to front.
+                    if(id == popups[i]) {
+                        Array.remove(popups, i);
+                        popups.unshift(id);                       
+                        calculate_popups();                    
+                        //id++;
+                        return;
+                    }
+                }               
+                
+                var element = '<div class="popup-box chat-popup" id="'+ id +'">';
+                element = element + '<div class="popup-head">';
+                element = element + '<div class="popup-head-left">'+ name +'</div>';
+                element = element + '<div class="popup-head-right"><a href="javascript:close_popup(\''+ id +'\');">&#10005;</a></div>';
+                element = element + '<div style="clear: both"></div></div><div id="chat" class="popup-messages"></div>';
+				element = element + '<div class="popup-input"><input type="text" id="chat-message" class="chat-input" autocomplete="off" onkeyup="sendMessage(event, this)"></div></div>'
+                
+                /*document.getElementsByClassName("all")[0].innerHTML = document.getElementsByClassName("all")[0].innerHTML + element;*/
+				$(".all").append(element);
+        
+                popups.unshift(id);
+                        
+                calculate_popups();     
+            }
+            
+            //calculate the total number of popups suitable and then populate the toatal_popups variable.
+            function calculate_popups() {
+                var width = window.innerWidth;
+                if(width < 540) {
+                    total_popups = 0;
+                }
+                else {
+                    width = width - 200;
+                    //320 is width of a single popup box
+                    total_popups = parseInt(width/320);
+                }
+                
+                display_popups();
+                
+            }
+            
+            //recalculate when window is loaded and also when window is resized.
+            window.addEventListener("resize", calculate_popups);
+            window.addEventListener("load", calculate_popups);
+	
+	
+	//CHAT APP
+		var socket = io.connect();
+		var logged_user = document.getElementsByClassName('dropbtn')[0].innerHTML;
+	
+		function chatPopup() {
+			socket.emit('new user', logged_user, function(data) {
+				console.log(logged_user);
+			});
+		};
+	
+		function sendMessage(event, inputDOM) {
+			if(event.keyCode == 13) {
+				var chat = inputDOM.parentNode.previousElementSibling.id;
+
+				socket.emit('send message', inputDOM.parentNode.parentNode.id + " " + inputDOM.value, function(data) { 
+					$(document.getElementById(inputDOM.parentNode.parentNode.id).children[1]).append('<span class="error">' + data + '</span><br>');
+				});
+				inputDOM.value = "";
+					
+			}
+		}
+	
+		socket.on('new message', function(data) {
+			var currentdate = new Date();
+			var datetime =  currentdate.getDate() + "/"
+						+ (currentdate.getMonth()+1)  + "/" 
+						+ currentdate.getFullYear() + "  "  
+						+ currentdate.getHours() + ":"  
+						+ currentdate.getMinutes() + ":" 
+						+ currentdate.getSeconds();
+ 
+			register_popup(data.sender, data.sender_name + " " + data.sender_surname);
+			$(document.getElementById(data.sender).children[1]).append('<span class="chat_message"><b>' + data.user + ': </b>' + data.msg + '<i> [' + datetime + ']</i></span><br>');	
+		});
+	
+</script>
+
+</body>
+<p class="footer_style">&copy; Marina Basic</p>
+</div>
+</html>

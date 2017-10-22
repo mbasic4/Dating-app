@@ -1,0 +1,31 @@
+<% include header %>
+<body class="profile">
+  <div class="profile_style">	
+	<div class="profile_decoration">  
+		<h2> <%= user[0].name %> <%= user[0].surname %> </h2>
+		<div class="profile_pic">
+		 	<% if(user[0].image_url) { %>
+				<img src="<%= user[0].image_url %>" />
+			<%} else { %>
+			  <% if(user[0].gender == "F") { %>
+				<img src="../images/user_female_ai.png" />
+			  <%} else { %>
+				<img src="../images/user_male_ai.png" />
+			  <%}%>
+			<%}%>
+		</div>
+		<div class="profile_content">
+			<% if(user[0].gender == "F") { %>
+			  <h4> Female </h4>
+			<%} else { %>
+			  <h4> Male </h4>
+			 <%}%>
+			<h4> <%= user[0].age %> years old </h4>
+			<h4> Lives in <%= user[0].country_name %> </h4>
+			<% if(user[0].description != "") { %>
+			  <p><i>"<%=user[0].description %>"</i></p>
+			<%}%>
+		</div>
+	</div>	
+  </div>
+<% include footer %>

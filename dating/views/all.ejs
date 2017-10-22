@@ -1,0 +1,50 @@
+<% include header %>
+<body onload="chatPopup()" class="all">
+  <div class="users_style">
+	
+	<div class="search">
+	  <p style="color:dimgray; text-shadow:2px 2px 5px black; font-size:1.1em;">Filter by:</p>
+	  <div>
+		<select placeholder="gender" class="filter_gender" id="filter_gender" name="gender">
+			<option selected disabled hidden="hidden">Gender</option>
+			<option value="Gender"></option>
+			<option value="F">Female</option>
+			<option value="M">Male</option>
+		</select>
+		<input autocomplete="off" type="text" placeholder="Country" list="countries" class="search_input" id="search_input" name="country" onkeyup="searchUsers()"><button type="button" class="search_button" id="search_button" onclick="filterUsers()">
+				<i class="fa fa-search"></i></button>
+		<datalist id="countries">
+
+		</datalist>	
+	  </div>
+	</div>
+	<ul id="users_list" style="list-style-type:none;">
+		<% for (var i=0; i < users.length; i++) { %>
+			<li>
+			  <div class="users_decoration">
+				<div class="users_pic">
+					<% if(users[i].image_url) { %>
+						<img src="<%= users[i].image_url %>" />
+					<%} else { %>
+					  <% if(users[i].gender == "F") { %>
+						<img src="../images/user_female_ai.png" />
+					  <%} else { %>
+						<img src="../images/user_male_ai.png" />
+					  <%}%>
+					<%}%>
+				</div>
+				<div class="users_content">
+					<h5> <%= users[i].name %> <%= users[i].surname %> </h5>
+					<p><%= users[i].age %> years old </p>
+					<p style="border-bottom:1px solid dimgray;">Lives in <%= users[i].country_name %> </p>
+					<% if(users[i].description != "" && users[i].description != null) { %>
+						<h6><i>"<%= users[i].description %>"</i></h6>
+					<%}%>
+					<button class="chat_btn" onclick='register_popup(<%= users[i].user_id %>, "<%= users[i].name %> <%= users[i].surname %>")'>Chat</button>
+				</div>
+			  </div>
+			</li><br>
+		<% } %>
+	</ul>
+  </div>
+<% include footer %>

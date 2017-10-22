@@ -1,0 +1,40 @@
+<% include header %>
+<body class="home">
+  <div class="home_style">
+	<h1 class="welcome">Welcome to OcupidMyHeart website</h1><br>
+	<svg class="heart-loader" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 90 90" version="1.1">
+	  <g class="heart-loader__group">
+		<path class="heart-loader__square" stroke-width="1" fill="none" d="M0,30 0,90 60,90 60,30z"/>
+		<path class="heart-loader__circle m--left" stroke-width="1" fill="none" d="M60,60 a30,30 0 0,1 -60,0 a30,30 0 0,1 60,0"/>
+		<path class="heart-loader__circle m--right" stroke-width="1" fill="none" d="M60,60 a30,30 0 0,1 -60,0 a30,30 0 0,1 60,0"/>
+		<path class="heart-loader__heartPath" stroke-width="2" d="M60,30 a30,30 0 0,1 0,60 L0,90 0,30 a30,30 0 0,1 60,0" />
+	  </g>
+	</svg>
+	<h3 class="message">Create a profile or sign in with an existing account to get started</h3><br>	
+	<div class="icons_container">
+	  <div style="display:inline-block;">
+		<p class="home_icons">Create new profile</p><a href="./users/create"><i class="ionicons ion-ios-personadd-outline"></i></a>
+	  </div>
+	  <div style="float:right;">
+		  <p class="home_icons">Sign in</p><a href="#sign_in"><i class="ionicons ion-log-in"></i></a>
+	  </div>
+	</div>
+	<div class="signin_form_style" id="sign_in">
+	 <form method="post" action="/signin" id="form_signin">
+	  <div>
+	  	<div style="position:relative; height:180px;">
+			<img src="../images/user_love.png" class="sign_in_image">
+		</div><br>
+		<div class="required">
+			<label for="username_signin" class="form_font">Username:</label>
+			<input type="text" id="username_signin" name="username" required><br>
+			<label for="password_signin" class="form_font">Password:</label>
+			<input type="password" id="password_signin" name="password" required>
+		</div><br>
+		<button id="signin" class="sign_in" onclick="checkSignin();">Sign in</button><br>
+		<p class="sign_in_Q">Don't have an account yet? Create your profile<a href="./users/create" class="link_Q"> here.</a></p>
+	  </div>
+	 </form>
+	</div>
+  </div>
+<% include footer %>
