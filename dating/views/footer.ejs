@@ -1,6 +1,6 @@
 	
 <script>
-	//checks if all the fields in form are filled, and changes colors of the steps accordingly
+	//Checks if all the fields in form are filled, and changes colors of the steps accordingly
 	function stepProgress(stepNo) {
 		var i;
 		var x = document.getElementsByClassName("user_form_style");
@@ -53,7 +53,7 @@
 	}
 
 	
-	//checks the email format, username availability and password match	
+	//Checks the email format, username availability and password match	
 	function checkEmail() {
 		var email = document.getElementById("email").value;
 		if(email == "") {
@@ -73,7 +73,7 @@
 		}
 	}
 	
-	//live checks the availability of username
+	//Live checks the availability of username
 	function checkUsername() {
 	    var xhttp = new XMLHttpRequest();
 	    var username = document.getElementById("username").value;
@@ -107,7 +107,7 @@
 		}
 	}
 	
-	//checks if passwords match
+	//Checks if passwords match
 	function checkPassword() {
 		var password1 = document.getElementById("password").value;
 		var password2 = document.getElementById("conf_pass").value;
@@ -128,7 +128,7 @@
 		}
 	}
 	
-	
+	//Checks if the username exists, if so the sign in form goes to passport strategy, if not, a message is displayed for the user
 	function checkSignin() {
 		var xhttp = new XMLHttpRequest();		
 	    var user_signin = document.getElementById("username_signin").value;
@@ -162,7 +162,7 @@
 		xhttp.send('username='+user_signin+'&password='+password_signin);
 	}
 	
-	
+	//While the user is typing letters it live checks the countries (in which users live) that start with those letters, and appends the results
 	function searchUsers() {	
 		var xhttp = new XMLHttpRequest();
 		var country_list = document.getElementById("countries");	
@@ -192,7 +192,7 @@
 		xhttp.send();
 	}
 	
-	
+	//Renders users based on the results received from filtering the users by gender and country name
 	function filterUsers() {
 		var xhttp = new XMLHttpRequest();
 		var users_ul = document.getElementById("users_list");
@@ -259,14 +259,6 @@
 					div_1.appendChild(div_1_2);
 					users_li.appendChild(div_1);
 					users_ul.appendChild(users_li);
-					
-					/*
-					var popups = function () {
-						var id = ;
-						var name = ;
-						return register_popup(id, name);
-					};
-					document.getElementById("samin").addEventListener("click", popups());*/
 				}
 			}	
 		}
@@ -274,7 +266,7 @@
 		xhttp.send();
 	}
 	
-	
+	//Delete profile warning
 	$("#del_profile").click(function() {
 		swal({
 		  
@@ -295,14 +287,14 @@
 	});
 	
 	
-/*CHAT POPUPS*/
+//CHAT POPUPS
 Array.remove = function(array, from, to) {
                 var rest = array.slice((to || from) + 1 || array.length);
                 array.length = from < 0 ? array.length + from : from;
                 return array.push.apply(array, rest);
             };
         
-            //this variable represents the total number of popups can be displayed according to the viewport width
+            //this variable represents the total number of popups that can be displayed according to the viewport width
             var total_popups = 0;
             
             //arrays of popups ids
@@ -360,7 +352,6 @@ Array.remove = function(array, from, to) {
                 element = element + '<div style="clear: both"></div></div><div id="chat" class="popup-messages"></div>';
 				element = element + '<div class="popup-input"><input type="text" id="chat-message" class="chat-input" autocomplete="off" onkeyup="sendMessage(event, this)"></div></div>'
                 
-                /*document.getElementsByClassName("all")[0].innerHTML = document.getElementsByClassName("all")[0].innerHTML + element;*/
 				$(".all").append(element);
         
                 popups.unshift(id);
@@ -392,13 +383,15 @@ Array.remove = function(array, from, to) {
 	//CHAT APP
 		var socket = io.connect();
 		var logged_user = document.getElementsByClassName('dropbtn')[0].innerHTML;
-	
+		
+		//emits the username of the currently signed in user
 		function chatPopup() {
 			socket.emit('new user', logged_user, function(data) {
 				console.log(logged_user);
 			});
 		};
-	
+		
+		//emits messages, and if message is empty, or receiver is offline it appends an error message in a chat window
 		function sendMessage(event, inputDOM) {
 			if(event.keyCode == 13) {
 				var chat = inputDOM.parentNode.previousElementSibling.id;
@@ -410,7 +403,8 @@ Array.remove = function(array, from, to) {
 					
 			}
 		}
-	
+		
+	    //receives messages, and displays them in a chat window only for the sender and the receiver
 		socket.on('new message', function(data) {
 			var currentdate = new Date();
 			var datetime =  currentdate.getDate() + "/"

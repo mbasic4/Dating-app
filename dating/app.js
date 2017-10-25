@@ -9,7 +9,6 @@ import expressSession from 'express-session';
 import passportLocal from 'passport-local';
 import mysql from 'mysql';
 import multer from 'multer';
-import mime from 'mime';
 import shortId from 'shortid';
 
 import {Strategy} from 'passport-local';
@@ -17,6 +16,8 @@ import {Strategy} from 'passport-local';
 import index from './routes/index';
 import users from './routes/users';
 
+
+//Database connection
 let connection = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -26,6 +27,8 @@ let connection = mysql.createConnection({
 
 connection.connect();
 
+
+//Storing profile images
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     req.image_url = './public/profile_photos';
@@ -40,10 +43,10 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage });
 
+
 let app = express();
 var server = require('http').createServer(app);
 var socketIo = require('socket.io')(server);
-//var socketIo = require('socket.io').listen(server);
 var chat_users = {};
 
 server.listen(8080);
@@ -59,6 +62,7 @@ app.use(cookieParser());
 app.use(expressSession({secret:"marina secret key", resave:true, saveUninitialized:false}));
 app.use(express.static(path.join(__dirname, 'public')));
 
+
 //Passport
 app.use(passport.initialize()); 
 app.use(passport.session());
@@ -72,6 +76,7 @@ passport.use("local-signin", new Strategy(function(username, password, done) {
 	})
 	
 })); 
+
 passport.use("local-signup",new Strategy({passReqToCallback:true}, function(req, username, password, done){
     connection.query('SELECT * FROM users WHERE username = ?', username, function(err,result){
         if(err) throw err;
@@ -92,25 +97,29 @@ passport.use("local-signup",new Strategy({passReqToCallback:true}, function(req,
 })); 
 
 passport.serializeUser(function( user, done ) {
-    //odredujemo sto spremamo u sesiju
     done(null, user.id);
 }); 
 
 passport.deserializeUser(function( user , done ) {
-    //rehidracija, pomoci id retreiveamo informacije iz sesije
-   done( null, user); // user ce bit zakvacen za req.user req.logout() za logout
+   done( null, user);
 }); 
 
+
+//Signing up and uploading image
 app.post('/signup', upload.any(), passport.authenticate('local-signup', {
     successRedirect: '/users/profile', 
     failureRedirect: '/users/create', 
 }));
 
+
+//Sign in
 app.post('/signin', passport.authenticate('local-signin', {
 	successRedirect: '/users/profile',
 	failureRedirect: '/home/#sign_in',
 }));
 
+
+//Editing user's profile
 app.post('/edit_profile', upload.any(), (req, res) => {
 	var q = req.body;
 	if(req.image_url) {
@@ -124,13 +133,15 @@ app.post('/edit_profile', upload.any(), (req, res) => {
 	});
 });
 
+
+//Sign out
 app.get('/logout', function(req, res) {
     req.logout();
 	res.cookie('connect.sid', {path: '/'}, {maxAge: 0, expires: 0}).redirect('/home');
 });
 
 
-
+//Chat
 socketIo.sockets.on('connection', function(socket) {
 	socket.on('new user', function(data, callback) {
 		callback(true);
